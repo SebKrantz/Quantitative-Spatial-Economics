@@ -18,7 +18,7 @@ function load_dir(dir::String)
     end
 end
 
-cd("literature/Redding QSE/ARE_JuliaPrograms/")
+cd("QSE-ARE-2017/ARE_JuliaPrograms/")
 load_dir("functions")
 
 
