@@ -5,7 +5,6 @@ function solveHLwCtyOpen_E(fund, dist, bord, bordc, nobs)
     xtic = time()
 
     # Extract location characteristics from fundamentals matrix;
-    # fund[:,1]=a; fund[:,2]=H; fund[:,3]=Iwest; fund[:,4]=Ieast;
     a = fund[:,1]
     H = fund[:,2]
     Iwest = fund[:,3]
@@ -17,8 +16,8 @@ function solveHLwCtyOpen_E(fund, dist, bord, bordc, nobs)
     dtradesh = 0
 
     # Initialization based on a symmetric allocation;
-    L_i = ones(nobs,1) .* (LL/nobs)
-    w_i = ones(nobs,1)
+    L_i = ones(nobs) .* (LL/nobs)
+    w_i = ones(nobs)
 
     # trade costs;
     dd = (dist .* bord .* bordc) .^ (1-sigma)
@@ -37,7 +36,7 @@ function solveHLwCtyOpen_E(fund, dist, bord, bordc, nobs)
         pwmat = (L_i .* (a .^ (sigma-1)) .* (w_i .^ (1-sigma))) * ones(1,nobs)
         nummat = dd .* pwmat
         denom = sum(nummat, dims = 1)
-        denommat = ones(nobs,1) * denom
+        denommat = ones(nobs) * denom
         tradesh = nummat ./ denommat
         # # test;
         # test = sum(tradesh, dims = 1)
@@ -52,7 +51,7 @@ function solveHLwCtyOpen_E(fund, dist, bord, bordc, nobs)
 
         # Population mobility equilibrium condition;
         num = ((a .^ alpha) .* (H .^ (1-alpha)) .* (dtradesh .^ (-alpha/(sigma-1)))) .^ ((sigma-1)/((sigma*(1-alpha))-1))
-        L_e = zeros(nobs,1)
+        L_e = zeros(nobs)
         L_e[wind] = num[wind] ./ sum(num[wind])
         L_e[eind] = num[eind] ./ sum(num[eind])
         L_e[wind] = L_e[wind] .* LLwest
@@ -64,7 +63,7 @@ function solveHLwCtyOpen_E(fund, dist, bord, bordc, nobs)
         L_i_r = round.(L_i .* (10^6))
         L_e_r = round.(L_e .* (10^6))
 
-        #disp([x max(abs(income_r-expend_r)) max(abs(L_e_r-L_i_r))]);
+        # [x, maximum(abs.(income_r - expend_r)), maximum(abs.(L_e_r - L_i_r))]
 
         # Update loop;
         if (income_r == expend_r) & (L_i_r == L_e_r)
