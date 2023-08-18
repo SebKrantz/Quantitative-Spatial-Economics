@@ -21,26 +21,10 @@ end
 cd("QSE-ARE-2017/ARE_JuliaPrograms/")
 load_dir("functions")
 
-
 using Distributions
 using LinearAlgebra
 using Statistics
 using StatsBase
-
-# No need to declare globals in Julia (only if they are mutable)
-# global alpha 
-# global sigma 
-# global LL 
-# global LLwest 
-# global LLeast 
-# global F
-
-# ************************
-# **** Initialization ****
-# ************************
-
-# Set default random number stream
-# s = MersenneTwister(1)
 
 # *************************
 # **** Distance matrix ****
@@ -57,27 +41,17 @@ NN = N*N
 ltd = range(0,stop=4,length=N)' 
 lgd = range(0,stop=4,length=N)
 
-# Transport costs for each point on grid
-tt = 1
-τ = fill(tt, (N,N))
+# # Transport costs for each point on grid
+# tt = 1
+# τ = fill(tt, (N,N))
 
 # Compute weighted distance using these transport costs
-
 dist = Matrix{Float64}(undef, NN, NN)
 
-
-# # Convert Matrix to nested tuples
-# function mattup(A)
-#     ntuple(i -> ntuple(j -> A[i,j], size(A,2)), size(A,1))
+# #  using ImageMorphology
+# function my_dist_transform(X)
+#     return distance_transform(feature_transform(X))
 # end
-
-# # Function to convert vec(A) to a tuple
-# function vectotuple(v::Vector)
-#     t = ntuple(i -> v[i], length(v))
-#     return t
-# end
-
-#  using ImageMorphology
 
 ## Same done manually
 function my_dist_transform(X)
@@ -95,7 +69,7 @@ for z in 1:NN
     seed = falses(N,N)
     seed[z] = true
     # w = vectotuple(vec(τ))
-    temp = my_dist_transform(seed) # distance_transform(feature_transform(seed)) # w # graydist(τ,seed,'quasi-euclidean')
+    temp = my_dist_transform(seed) # graydist(τ,seed,'quasi-euclidean')
     dist[z,:] = temp[:]
 end
 
@@ -143,7 +117,7 @@ sigma = 5
 # ************************************
 
 # a = rand(Normal(0,1), NN, 1)
-# Read a.csv
+# Read a.csv: same as used in the paper: from Matlab with random number stream set. 
 using CSV
 using DataFrames
 a = CSV.read("a.csv", DataFrame; header = false) # Read a.csv
@@ -160,7 +134,7 @@ println("mean(a) std(a) max(a) min(a)")
 # **************************:
 
 # Land area
-H = 100*ones(NN,1)   
+H = 100 * ones(NN)   
 
 # Aggregate labor Supply 
 LL = 153889 # US civilian labor force 2010 (Statistical Abstract, millions)

@@ -51,6 +51,7 @@ function solveHLwCtyOpen_E(fund, dist, bord, bordc, nobs)
 
         # Population mobility equilibrium condition;
         num = ((a .^ alpha) .* (H .^ (1-alpha)) .* (dtradesh .^ (-alpha/(sigma-1)))) .^ ((sigma-1)/((sigma*(1-alpha))-1))
+        # This ensures population immobility across countries (ensuring the countries overall population shares are the same)
         L_e = zeros(nobs)
         L_e[wind] = num[wind] ./ sum(num[wind])
         L_e[eind] = num[eind] ./ sum(num[eind])
