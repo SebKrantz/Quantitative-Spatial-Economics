@@ -1,6 +1,6 @@
 
 function cftualLw(param, fund, L, w, tradesh, dist, Cdist, nobs)
-    global alpha sigma theta epsilon LL
+    # global alpha sigma theta epsilon LL
 
     xtic = time()
 
@@ -36,10 +36,10 @@ function cftualLw(param, fund, L, w, tradesh, dist, Cdist, nobs)
         while x < 2000
             pwmat = ((Cw_i ./ w) .^ (-theta)) * ones(1, nobs)
             nummat = tradesh .* ddhat .* pwmat
-            denom = sum(nummat)
+            denom = sum(nummat, dims = 1)
             denommat = ones(nobs, 1) * denom
             Ctradesh = nummat ./ denommat
-            test = sum(Ctradesh)
+            test = sum(Ctradesh, dims = 1)
             mntest = mean(test)
             income = (Cw_i ./ w) .* (CL_i ./ L) .* gdp
             expend = Ctradesh * income

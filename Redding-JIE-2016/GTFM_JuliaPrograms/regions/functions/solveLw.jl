@@ -1,6 +1,6 @@
 function solveLw(param, fund, dist, nobs)
 
-    global alpha sigma theta epsilon LL
+    # global alpha sigma theta epsilon LL
 
     xtic = time()
 
@@ -23,6 +23,8 @@ function solveLw(param, fund, dist, nobs)
     println(">>>> Start Wage and Population Convergence <<<<")
 
     xx = 1
+    tradesh = 0
+    dtradesh = 0
     while xx < 2000
 
         x = 1
@@ -30,11 +32,11 @@ function solveLw(param, fund, dist, nobs)
 
             pwmat = (a .* (w_i .^ (-theta))) * ones(1, nobs)
             nummat = dd .* pwmat
-            denom = sum(nummat)
+            denom = sum(nummat, dims = 1)
             denommat = ones(nobs) * denom
             tradesh = nummat ./ denommat
 
-            test = sum(tradesh)
+            test = sum(tradesh, dims = 1)
             mntest = mean(test)
 
             income = w_i .* L_i
@@ -43,7 +45,7 @@ function solveLw(param, fund, dist, nobs)
             income_r = round.(income .* (10 .^ 6))
             expend_r = round.(expend .* (10 .^ 6))
 
-            println([x, maximum(abs.(income_r - expend_r))])
+            # println([x, maximum(abs.(income_r - expend_r))])
 
             if income_r == expend_r
                 println(">>>> Wage Convergence Achieved <<<<")
@@ -68,7 +70,7 @@ function solveLw(param, fund, dist, nobs)
         L_i_r = round.(L_i .* (10 .^ 6))
         L_e_r = round.(L_e .* (10 .^ 6))
 
-        println([xx, maximum(abs.(L_e_r - L_i_r))])
+        # println([xx, maximum(abs.(L_e_r - L_i_r))])
 
         if L_i_r == L_e_r
             println(">>>> Population Convergence Achieved <<<<")

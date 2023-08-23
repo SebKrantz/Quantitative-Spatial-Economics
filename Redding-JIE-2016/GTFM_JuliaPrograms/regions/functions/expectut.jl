@@ -1,8 +1,6 @@
-function expectut(param, fund, L, w, tradesh, dist, nobs)
+function expectut(param, fund, L, tradesh)
 
-    global alpha sigma theta epsilon LL
-
-    xtic = tic()
+    # global alpha sigma theta epsilon LL
 
     # parameters
     alpha = param[1]

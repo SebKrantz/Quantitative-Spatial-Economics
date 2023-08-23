@@ -1,6 +1,6 @@
-function Hwelfare(param, fund, L, w, tradesh, dist, nobs)
+function Hwelfare(param, fund, L, tradesh)
 
-    global alpha theta epsilon Hsigma LL F
+    # global alpha theta epsilon Hsigma LL F
 
     # parameters
     alpha = param[1]
@@ -13,16 +13,16 @@ function Hwelfare(param, fund, L, w, tradesh, dist, nobs)
     H = fund[:,3]
 
     # delta function
-    deltaf = gamma((epsilon-1)./epsilon)
+    deltaf = gamma((epsilon-1)/epsilon)
 
     # domestic trade share
     dtradesh = diag(tradesh)
 
     # welfare
-    welf = deltaf.*(b.^(1./epsilon)).*(a.^alpha).*((1./dtradesh).^(alpha./theta)).*(H.^(1-alpha))
-    welf = welf.*(L.^(-((1./epsilon)+(1-alpha)-(alpha./theta))))
-    welf = welf./(alpha.*(((1-alpha)./alpha).^(1-alpha)).*((Hsigma./(Hsigma-1)).^alpha).*((Hsigma.*F).^(alpha./theta)))
-    welf = welf./(LL.^(-1./epsilon))
+    welf = deltaf .* (b .^ (1/epsilon)) .* (a .^ alpha) .* ((1 ./ dtradesh) .^ (alpha/theta)) .* (H .^ (1-alpha))
+    welf = welf .* (L .^ (-((1/epsilon)+(1-alpha)-(alpha/theta))))
+    welf = welf ./ (alpha .* (((1-alpha)/alpha)^(1-alpha)) .* ((Hsigma/(Hsigma-1))^alpha) .* ((Hsigma .* F) .^ (alpha/theta)))
+    welf = welf ./ (LL .^ (-1/epsilon))
 
     return welf
 end

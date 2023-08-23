@@ -1,5 +1,5 @@
 function Hmobwelfaregains(param, fund, Ctradesh, tradesh, CL, L, nobs)
-    global alpha theta epsilon LL
+    # global alpha theta epsilon LL
 
     # parameters
     alpha = param[1]

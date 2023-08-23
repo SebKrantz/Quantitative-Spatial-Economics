@@ -1,7 +1,7 @@
 function thetaepsopt(BETA)
 
-    global alpha sigma theta epsilon LL nobs W
-    global observe Cobserve dist0 dist1
+    # global alpha sigma theta epsilon LL nobs W
+    # global observe Cobserve dist0 dist1
 
     theta = BETA[1]
     epsilon = BETA[2]
