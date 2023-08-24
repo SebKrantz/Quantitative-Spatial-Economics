@@ -11,7 +11,7 @@
 using Random
 using Statistics
 using Plots
-using LaTeXStrings
+# using LaTeXStrings
 using LinearAlgebra
 using StatsBase: geomean
 using SpecialFunctions: gamma # gamma function
