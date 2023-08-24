@@ -15,6 +15,11 @@ using LaTeXStrings
 using LinearAlgebra
 using StatsBase: geomean
 using SpecialFunctions: gamma # gamma function
+# using Interpolations
+using Dierckx # 2D interpolation
+# using StatsModels: regress
+
+cd("Redding-JIE-2016/GTFM_JuliaPrograms/regions")
 
 include("../graydist.jl")
 
@@ -341,7 +346,6 @@ Hacrwelfgain = acrwelfaregains(param, CHtradesh, tradesh)
 # Perfectly mobile welfare gains
 Hmobwelfgain = mobwelfaregains(param, CHtradesh, tradesh, CHL, L)
 
-## TODO: You are Here !! ###
 # *****************************
 # **** Solve Unobservables ****
 # *****************************
@@ -374,7 +378,7 @@ CHobserve[:, 3] = H
 # Solve for region productivities and amenities
 CHa_i, CHb_i, CHabtradesh, CHaconverge, CHbconverge, CHxtic = 
     solveHab(param, CHobserve, dist1, nobs)
-    
+# TODO: seems it has not converged for amenities    
 @show "Helpman Productivity and Amenity System Converged"
 @show "Check Productivity and Amenity Convergence"
 @show CHaconverge, CHbconverge  
@@ -391,15 +395,25 @@ mnrdmat = reshape(mnrdist, N, N)
 XXL = range(minimum(lgd), stop=maximum(lgd), length=1000)  
 YYL = range(minimum(ltd), stop=maximum(ltd), length=1000)' 
 
-XXD, YYD, ZZD = griddata(lgd, ltd, mnrdmat, XXL, YYL)
-
-p1 = contourf(XXD, YYD, ZZD, levels=5, title="Mean change in trade cost", 
-    xlabel="Longitude", ylabel="Latitude", cbar=false,
-    xticks=(lgd[2], lgd[4], lgd[6], lgd[8], lgd[10]),
-    yticks=(lgd[2], lgd[4], lgd[6], lgd[8], lgd[10]),
-    xticklabels=[2,4,6,8,10], yticklabels=[2,4,6,8,10],
-    xlabelfontsize=8, ylabelfontsize=8, tickfontsize=8) 
-savefig(p1, "mean_rdist.pdf")
+# https://stackoverflow.com/questions/41176260/julia-how-to-interpolate-non-uniformly-spaced-2-d-data-onto-a-grid
+# using PyCall
+# @pyimport scipy.interpolate as si
+# using Dierckx
+function my_spline2d(x, y, z, xx, yy)
+    spl = Spline2D(collect(vec(x)), collect(vec(y)), collect(z))
+    xx = collect(vec(xx))
+    yy = collect(vec(yy))
+    xxe = repeat(xx, inner = length(yy))
+    yye = repeat(xx, outer = length(xx))
+    zz = evaluate(spl, xxe, yye)
+    return xx, yy, zz
+end
+# XXD, YYD, ZZD = griddata(lgd, ltd, mnrdmat, XXL, YYL)
+XXD, YYD, ZZD = my_spline2d(lgd, ltd, mnrdmat, XXL, YYL)
+p1 = contour(XXD, YYD, ZZD, levels=5, fill = true,
+             title="Mean change in trade cost", 
+             xlabel="Longitude", ylabel="Latitude") 
+savefig(p1, "graphs/mean_rdist.pdf")
 
 # ***********************************************
 # **** Three-Dimensional Initial Equilibrium ****
@@ -410,49 +424,49 @@ amat = reshape(a, N, N)
 XXL = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYL = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXA, YYA, ZZA = griddata(lgd, ltd, amat, XXL, YYL)  
+XXA, YYA, ZZA = my_spline2d(lgd, ltd, amat, XXL, YYL)  
 
 # AMENITIES
 bmat = reshape(b, N, N)
 XXL = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYL = range(minimum(ltd), stop=maximum(ltd), length=1000)' 
 
-XXB, YYB, ZZB = griddata(lgd, ltd, bmat, XXL, YYL)
+XXB, YYB, ZZB = my_spline2d(lgd, ltd, bmat, XXL, YYL)
 
 # POPULATION  
 Lmat = reshape(L, N, N)
 XXL = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYL = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXL, YYL, ZZL = griddata(lgd, ltd, Lmat, XXL, YYL)
+XXL, YYL, ZZL = my_spline2d(lgd, ltd, Lmat, XXL, YYL)
 
 # PRICE INDEX
 Pmat = reshape(P, N, N)  
 XXP = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYP = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXP, YYP, ZZP = griddata(lgd, ltd, Pmat, XXP, YYP)
+XXP, YYP, ZZP = my_spline2d(lgd, ltd, Pmat, XXP, YYP)
 
 # WAGE
 wmat = reshape(w, N, N)
 XXw = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYw = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXw, YYw, ZZw = griddata(lgd, ltd, wmat, XXw, YYw)
+XXw, YYw, ZZw = my_spline2d(lgd, ltd, wmat, XXw, YYw)
 
 # RELATIVE LAND PRICE
 rmat = reshape(r, N, N)  
 XXr = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYr = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXr, YYr, ZZr = griddata(lgd, ltd, rmat, XXr, YYr)
+XXr, YYr, ZZr = my_spline2d(lgd, ltd, rmat, XXr, YYr)
 
 # MULTI-PANEL FIGURE
 p2 = plot(
-    contourf(XXA, YYA, ZZA, levels=5, title="Panel A: Productivity",
-        xticks=(lgd[2], lgd[4], lgd[6], lgd[8], lgd[10]), 
-        yticks=(lgd[2], lgd[4], lgd[6], lgd[8], lgd[10]),
-        xticklabels=[2,4,6,8,10], yticklabels=[2,4,6,8,10]),
+    contourf(XXA, YYA, ZZA, levels=5, title="Panel A: Productivity"),
+        # xticks=(lgd[2], lgd[4], lgd[6], lgd[8], lgd[10]), 
+        # yticks=(lgd[2], lgd[4], lgd[6], lgd[8], lgd[10]),
+        # xticklabels=[2,4,6,8,10], yticklabels=[2,4,6,8,10]),
         
     contourf(XXB, YYB, ZZB, levels=5, title="Panel B: Amenities"),
     
@@ -464,56 +478,56 @@ p2 = plot(
     
     contourf(XXr, YYr, ZZr, levels=5, title="Panel F: Land Prices"),
     
-    layout=(3, 2), size=(800, 600), xlabelfontsize=8, ylabelfontsize=8, 
-        tickfontsize=8
+    layout=(3, 2), size=(900, 800),
+        titlefontsize = 13 # tickfontsize = 10
 )
-savefig(p2, "initial_equil.pdf")
+savefig(p2, "graphs/initial_equil.pdf")
 
 
 # **************************************************************************
 # **** Three-Dimensional Impact of Change in Trade Costs Counterfactual ****
 # **************************************************************************
 
-dL = CL./L
+dL = CL ./ L
 ldL = log.(dL)  
 
-dw = Cw./w
+dw = Cw ./ w
 ldw = log.(dw)
 
-dr = Cr./r
+dr = Cr ./ r
 ldr = log.(dr)
 
-dP = CP./P
+dP = CP ./ P
 ldP = log.(dP)
 
 lacrwelfgain = log.(acrwelfgain)
 
-drealw = Crealwage./realwage  
+drealw = Crealwage ./ realwage  
 ldrealw = log.(drealw)
 
 dtradesh = diag(tradesh) 
 Cdtradesh = diag(Ctradesh)
-ddtradesh = Cdtradesh./dtradesh
+ddtradesh = Cdtradesh ./ dtradesh
 
-HdL = CHL./HL
+HdL = CHL ./ HL
 lHdL = log.(HdL)
 
-Hdw = CHw./Hw
+Hdw = CHw ./ Hw
 lHdw = log.(Hdw) 
 
-Hdr = CHr./Hr
+Hdr = CHr ./ Hr
 lHdr = log.(Hdr)
 
-HdP = CHP./HP
+HdP = CHP ./ HP
 lHdP = log.(HdP)
 
 lHacrwelfgain = log.(Hacrwelfgain)
 
-Hdrealw = CHrealwage./Hrealwage
+Hdrealw = CHrealwage ./ Hrealwage
 lHdrealw = log.(Hdrealw)
 
 CHdtradesh = diag(CHtradesh)
-Hddtradesh = CHdtradesh./dtradesh
+Hddtradesh = CHdtradesh ./ dtradesh
 
 # GRID DATA
 
@@ -522,49 +536,49 @@ dLmat = reshape(dL, N, N)
 XXL = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYL = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXL, YYL, ZZL = griddata(lgd, ltd, dLmat, XXL, YYL)
+XXL, YYL, ZZL = my_spline2d(lgd, ltd, dLmat, XXL, YYL)
 
 # REAL WAGE  
 drealwmat = reshape(drealw, N, N) 
 XXrw = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYrw = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXrw, YYrw, ZZrw = griddata(lgd, ltd, drealwmat, XXrw, YYrw)
+XXrw, YYrw, ZZrw = my_spline2d(lgd, ltd, drealwmat, XXrw, YYrw)
 
 # PRICE INDEX
 dPmat = reshape(dP, N, N)
 XXP = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYP = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXP, YYP, ZZP = griddata(lgd, ltd, dPmat, XXP, YYP)
+XXP, YYP, ZZP = my_spline2d(lgd, ltd, dPmat, XXP, YYP)
 
 # WAGE
 dwmat = reshape(dw, N, N) 
 XXw = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYw = range(minimum(ltd), stop=maximum(ltd), length=1000)' 
 
-XXw, YYw, ZZw = griddata(lgd, ltd, dwmat, XXw, YYw)
+XXw, YYw, ZZw = my_spline2d(lgd, ltd, dwmat, XXw, YYw)
 
 # RELATIVE LAND PRICE
 drmat = reshape(dr, N, N)
 XXr = range(minimum(lgd), stop=maximum(lgd), length=1000)  
 YYr = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXr, YYr, ZZr = griddata(lgd, ltd, drmat, XXr, YYr)
+XXr, YYr, ZZr = my_spline2d(lgd, ltd, drmat, XXr, YYr)
 
 # ACR WELFARE
 acrmat = reshape(acrwelfgain, N, N) 
 XXa = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYa = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXa, YYa, ZZa = griddata(lgd, ltd, acrmat, XXa, YYa)
+XXa, YYa, ZZa = my_spline2d(lgd, ltd, acrmat, XXa, YYa)
 
 # WELFARE
 welfmat = reshape(welfgain, N, N)
 XXwelf = range(minimum(lgd), stop=maximum(lgd), length=1000) 
 YYwelf = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXwelf, YYwelf, ZZwelf = griddata(lgd, ltd, welfmat, XXwelf, YYwelf)
+XXwelf, YYwelf, ZZwelf = my_spline2d(lgd, ltd, welfmat, XXwelf, YYwelf)
 
 # MULTI-PANEL FIGURE
 p3 = plot(
@@ -578,63 +592,64 @@ p3 = plot(
     
     contourf(XXrw, YYrw, ZZrw, levels=5, title="Panel E: Real Wage"),
     
-    contourf(XXa, YYa, ZZa, levels=5, 
-        title="Panel F: Incorrect Immobile Welfare"),
+    contourf(XXa, YYa, ZZa, levels=5, title="Panel F: Incorrect Immobile Welfare"),
         
-    layout=(3, 2), size=(800, 600), xlabelfontsize=8, ylabelfontsize=8,
-        tickfontsize=8
+    layout=(3, 2), size=(900, 800), titlefontsize = 12
 )
 
-savefig(p3, "transport_impact.pdf")
+savefig(p3, "graphs/transport_impact.pdf")
 
 
 # HISTOGRAM FIGURE
 
 # Population
-histogram(ldL, bins=20, normalize=:probability, label="All")
+p41 = histogram(ldL, bins=20, normalize=:probability, label="All")
 histogram!(ldL[treat.==1], bins=20, normalize=:probability, label="Treated") 
 histogram!(ldL[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel A: Population")
 ylabel!("Probability")
 
 # Real wage
-histogram(ldrealw, bins=20, normalize=:probability, label="All")
+p42 = histogram(ldrealw, bins=20, normalize=:probability, label="All")
 histogram!(ldrealw[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(ldrealw[treat.==0], bins=20, normalize=:probability, label="Untreated") 
 title!("Panel B: Real Wage")
 ylabel!("Probability")
 
 # Price index  
-histogram(ldP, bins=20, normalize=:probability, label="All")
+p43 = histogram(ldP, bins=20, normalize=:probability, label="All")
 histogram!(ldP[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(ldP[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel C: Price Index") 
 ylabel!("Probability")
 
 # Wage
-histogram(ldw, bins=20, normalize=:probability, label="All")  
+p44 = histogram(ldw, bins=20, normalize=:probability, label="All")  
 histogram!(ldw[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(ldw[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel D: Wage")
 ylabel!("Probability")
 
 # Land price
-histogram(ldr, bins=20, normalize=:probability, label="All")
+p45 = histogram(ldr, bins=20, normalize=:probability, label="All")
 histogram!(ldr[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(ldr[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel E: Land Rents")
 ylabel!("Probability") 
 
 # ACR welfare
-histogram(acrwelfgain, bins=20, normalize=:probability, label="All") 
+p46 = histogram(acrwelfgain, bins=20, normalize=:probability, label="All") 
 histogram!(acrwelfgain[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(acrwelfgain[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel F: Incorrect Immobile Welfare")
 ylabel!("Probability")
 
-plot(welfgain .* ones(2), [0, 0.6], color="red", linestyle="-", linewidth=1.5)
+plot(p41, p42, p43, p44, p45, p46, 
+    layout=(3, 2), size=(900, 800), titlefontsize = 12) # , legend = :outertopright)
+# Hard to display actual welfare gain due to bin definition;
+# plot(welfgain * ones(1, 2), [0, 0.6], color="red", linestyle="-", linewidth=1.5)
 
-savefig("transport_histogram.pdf")
+savefig("graphs/transport_histogram.pdf")
 
 
 # Perfect mobility welfare  
@@ -643,7 +658,7 @@ histogram!(mobwelfgain, bins=20, normalize=:probability, label="Perfect Mobility
 xlabel!("Relative Change in Welfare")
 ylabel!("Probability")
 
-savefig("perfmobil_histogram.pdf")
+savefig("graphs/perfmobil_histogram.pdf")
 
 
 # HELPMAN GRID DATA
@@ -653,106 +668,111 @@ HdLmat = reshape(HdL, N, N)
 XXL = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYL = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXL, YYL, HZZL = griddata(lgd, ltd, HdLmat, XXL, YYL)
+XXL, YYL, HZZL = my_spline2d(lgd, ltd, HdLmat, XXL, YYL)
 
 # HELPMAN REAL WAGE
 Hdrealwmat = reshape(Hdrealw, N, N)
 XXrw = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYrw = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXrw, YYrw, HZZrw = griddata(lgd, ltd, Hdrealwmat, XXrw, YYrw)
+XXrw, YYrw, HZZrw = my_spline2d(lgd, ltd, Hdrealwmat, XXrw, YYrw)
 
 # HELPMAN PRICE INDEX
 HdPmat = reshape(HdP, N, N)
 XXP = range(minimum(lgd), stop=maximum(lgd), length=1000)  
 YYP = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXP, YYP, HZZP = griddata(lgd, ltd, HdPmat, XXP, YYP)
+XXP, YYP, HZZP = my_spline2d(lgd, ltd, HdPmat, XXP, YYP)
 
 # HELPMAN WAGE
 Hdwmat = reshape(Hdw, N, N)
 XXw = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYw = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXw, YYw, HZZw = griddata(lgd, ltd, Hdwmat, XXw, YYw)
+XXw, YYw, HZZw = my_spline2d(lgd, ltd, Hdwmat, XXw, YYw)
 
 # HELPMAN RELATIVE LAND PRICE  
 Hdrmat = reshape(Hdr, N, N)
 XXr = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYr = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXr, YYr, HZZr = griddata(lgd, ltd, Hdrmat, XXr, YYr)
+XXr, YYr, HZZr = my_spline2d(lgd, ltd, Hdrmat, XXr, YYr)
 
 # HELPMAN ACR WELFARE
 Hacrmat = reshape(Hacrwelfgain, N, N)
 XXa = range(minimum(lgd), stop=maximum(lgd), length=1000) 
 YYa = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXa, YYa, HZZa = griddata(lgd, ltd, Hacrmat, XXa, YYa)
+XXa, YYa, HZZa = my_spline2d(lgd, ltd, Hacrmat, XXa, YYa)
 
 # HELPMAN WELFARE
 Hwelfmat = reshape(Hwelfgain, N, N)  
 XXwelf = range(minimum(lgd), stop=maximum(lgd), length=1000)
 YYwelf = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 
-XXwelf, YYwelf, HZZwelf = griddata(lgd, ltd, Hwelfmat, XXwelf, YYwelf)
+XXwelf, YYwelf, HZZwelf = my_spline2d(lgd, ltd, Hwelfmat, XXwelf, YYwelf)
 
 # HELPMAN HISTOGRAM FIGURE
-histogram(lHdL, bins=20, normalize=:probability, label="All")
+p51 = histogram(lHdL, bins=20, normalize=:probability, label="All")
 histogram!(lHdL[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(lHdL[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel A: Population")
 ylabel!("Probability")
 
-histogram(lHdrealw, bins=20, normalize=:probability, label="All")  
+p52 = histogram(lHdrealw, bins=20, normalize=:probability, label="All")  
 histogram!(lHdrealw[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(lHdrealw[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel B: Real Wage")
 ylabel!("Probability")
 
-histogram(lHdP, bins=20, normalize=:probability, label="All")
+p53 = histogram(lHdP, bins=20, normalize=:probability, label="All")
 histogram!(lHdP[treat.==1], bins=20, normalize=:probability, label="Treated") 
 histogram!(lHdP[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel C: Price Index")
 ylabel!("Probability")
 
-histogram(lHdw, bins=20, normalize=:probability, label="All")
+p54 = histogram(lHdw, bins=20, normalize=:probability, label="All")
 histogram!(lHdw[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(lHdw[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel D: Wage")  
 ylabel!("Probability") 
 
-histogram(lHdr, bins=20, normalize=:probability, label="All")
+p55 = histogram(lHdr, bins=20, normalize=:probability, label="All")
 histogram!(lHdr[treat.==1], bins=20, normalize=:probability, label="Treated")
 histogram!(lHdr[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel E: Land Rents") 
 ylabel!("Probability")
 
-histogram(Hacrwelfgain, bins=20, normalize=:probability, label="All")
+p56 = histogram(Hacrwelfgain, bins=20, normalize=:probability, label="All")
 histogram!(Hacrwelfgain[treat.==1], bins=20, normalize=:probability, label="Treated") 
 histogram!(Hacrwelfgain[treat.==0], bins=20, normalize=:probability, label="Untreated")
 title!("Panel F: Incorrect Immobile Welfare")
 ylabel!("Probability")  
 
-plot(Hwelfgain .* ones(2), [0, 0.6], color="red", linestyle="-", linewidth=1.5)
+plot(p51, p52, p53, p54, p55, p56, 
+    layout=(3, 2), size=(900, 800), titlefontsize = 12) # , legend = :outertopright)
+# Hard to display actual welfare gain due to bin definition;
+# plot(Hwelfgain .* ones(2), [0, 0.6], color="red", linestyle="-", linewidth=1.5)
 
-savefig("H_transport_histogram.pdf")
+savefig("graphs/H_transport_histogram.pdf")
 
 
 # HELPMAN PRODUCTIVITIES FIGURE 
-plot(log.(a), log.(Ha_i), marker=:circle, label="Productivity")
+p61 = scatter(log.(a), log.(Ha_i), marker=:circle, label="Productivity")
 plot!(log.(a), log.(a), label="45 Degree Line")
 xlabel!("Constant Returns")
 ylabel!("Increasing Returns")
 title!("Panel A: Log Productivity")
 
-plot(log.(b), log.(Hb_i), marker=:circle, label="Amenities") 
+p62 = scatter(log.(b), log.(Hb_i), marker=:circle, label="Amenities") 
 plot!(log.(b), log.(b), label="45 Degree Line")
 xlabel!("Constant Returns") 
 ylabel!("Increasing Returns")
 title!("Panel B: Log Amenities")
 
-savefig("H_prod_amen.pdf")
+plot(p61, p62, layout=(1, 2), size=(900, 300), titlefontsize = 12)
+
+savefig("graphs/H_prod_amen.pdf")
 
 
 # *******************************
