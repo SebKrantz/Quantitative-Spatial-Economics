@@ -121,6 +121,8 @@ $$\Pi_a = \sum_{q:\,a\in A(q)}\sum_{i,j,s} \frac{\ln\phi_a}{\ln\Phi_q}\,\frac{\P
 
 which collapses to $\sum (\phi_a^{\chi_s}-1)/\phi_a^{\chi_s}\cdot X_{ij,sq}$ for a single authority and to the textbook $(\phi-1)/\phi \cdot \sum X$ when $\chi_s = 1$. Charging each authority's markup separately would over-extract. **Revenue is rebated to the collector country**, which is what makes the incidence result work: the toll is a wedge to shippers but income to Egypt/Panama/Iran/Oman.
 
+> Everything in this subsection — (12), (13), the authorities, the rebate — is precisely what the **no-tolls variant** of §9 deletes. Sections 3.1–3.4 survive there unchanged.
+
 ### 3.6 Computation in changes
 
 Exact hat algebra à la Dekle, Eaton & Kortum (2008). The extra block relative to a standard CP implementation is the transport fixed point:
@@ -262,14 +264,18 @@ Chokepoints interact because they are linked through the route structure. Gulf�
 
 The closest sibling is **FuchsFoongWong-MMN-2026**: both use a nested mode-over-route CES transport block with congestion, and both solve in changes. The distinctive contributions here are (a) **the price of passage is set by a revenue-maximizing agent** rather than given, (b) **multi-sector heterogeneity in $\chi_s$** drives differential exposure, and (c) chokepoints are **complements** (Hormuz then Suez), so tolls stack.
 
+The **no-tolls variant** of §9 deletes the "price of passage" row and leaves every other column untouched. That places it squarely between the two traditions in this table: it has FuchsFoongWong's endogenous, congestible, multimodal transport block, but sitting on a multi-sector Caliendo–Parro production side rather than a one-sector economic geography. If you want the transport mechanism without the industrial-organisation layer, that is the file to read.
+
 ---
 
 ## 7. Contents of This Folder
 
 | File | Description |
 |---|---|
-| `brockhaus_hinz_serfaty_chokepoint_model.jl` | **The model** — self-contained Julia implementation (see §8) |
+| `brockhaus_hinz_serfaty_chokepoint_model.jl` | **The full model** — self-contained Julia implementation (§8) |
 | `graphs/` | 10 output figures (PDF) |
+| `brockhaus_hinz_serfaty_no_tolls_model.jl` | **The no-tolls variant** — same CP system and transport block, priced-passage layer removed (§9) |
+| `graphs_no_tolls/` | 6 output figures (PDF) |
 | `Navigating Shocks _ The Ripple Effects of Shipping Route Closures_pdf.pdf` | Working paper (BdF WP 1057) |
 | `MinerU_markdown_...md` | OCR'd markdown of the paper |
 | `MinerU_latex_.../` | OCR'd LaTeX source + extracted figures |
@@ -284,13 +290,15 @@ The closest sibling is **FuchsFoongWong-MMN-2026**: both use a nested mode-over-
 
 ---
 
-## 8. The Julia Implementation
+## 8. The Julia Implementation — Full Model
+
+> This folder carries **two** implementations. The full model, with the monopoly toll layer, is described here; the **no-tolls variant** on branch `bhs-no-tolls` is §9. They share the baseline builder, the transport block and the solver architecture, and differ only in whether passages are priced.
 
 ```bash
 julia BrockhausHinzSerfaty-2026/brockhaus_hinz_serfaty_chokepoint_model.jl
 ```
 
-One self-contained file (~1,700 lines, no external data, ~5 min, dependencies `LinearAlgebra, Statistics, Random, Printf, Plots`). `BHS_QUICK=1` stops after calibration and verification. Ten figures are written to `graphs/`.
+One self-contained file (~1,750 lines, no external data, ~5 min, dependencies `LinearAlgebra, Statistics, Random, Printf, Plots`). `BHS_QUICK=1` stops after calibration and verification. Ten figures are written to `graphs/`.
 
 **What it is.** A **stylized 24-country × 8-sector calibration** carrying the paper's real chokepoint geography (Suez, Panama, Cape, Direct, and the four Hormuz composites), its real Gulf-side exposure shares $g_i$, and its calibrated elasticities. GTAP 11, the AIS trajectories and the Panjiva micro-data are not redistributable, so it reproduces the paper's **mechanisms and incidence pattern**, not the magnitudes of Tables 8–10. Loader hooks for a real baseline are in `Claude_Plan.md` §11; nothing below the data-assembly layer would change.
 
@@ -347,7 +355,7 @@ $\eta^R$ differs because it is identified off *this* baseline's Suez traffic and
 julia BrockhausHinzSerfaty-2026/brockhaus_hinz_serfaty_no_tolls_model.jl
 ```
 
-`brockhaus_hinz_serfaty_no_tolls_model.jl` keeps the Caliendo–Parro system and the whole transport block — freight-share pass-through, the two nests, route congestion, the global capacity constraint — and removes the toll layer entirely. No authorities, no $\phi_q$, no eq (12)–(13), no rent rebate, no re-baselining. Every passage is free; traversing one costs only what the link physically costs, which is still endogenous. ~1,230 lines, ~45 s, 10 figures in `graphs_no_tolls/`.
+`brockhaus_hinz_serfaty_no_tolls_model.jl` keeps the Caliendo–Parro system and the whole transport block — freight-share pass-through, the two nests, route congestion, the global capacity constraint — and removes the toll layer entirely. No authorities, no $\phi_q$, no eq (12)–(13), no rent rebate, no re-baselining. Every passage is free; traversing one costs only what the link physically costs, which is still endogenous. ~1,250 lines, ~45 s, 6 figures in `graphs_no_tolls/`.
 
 This is the paper's own "no chokepoint rents" world (Section 6.3) promoted from a robustness check to a standalone framework. Incidence lands on the economies whose cargo travels farther, not on a collector: **correlation(Suez exposure, welfare change) = −0.80**, against a near-zero relationship in the full model. Same plot, opposite finding — that contrast *is* Section 6.3.
 

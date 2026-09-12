@@ -1225,7 +1225,7 @@ p5 = bar(1:NS, CHI, legend = false, xticks = (1:NS, SECTORS), xrotation = 35,
          title = "Pass-through by sector: what makes a passage shock bite")
 savefig(p5, joinpath(GRAPHDIR, "nt_freight_shares.pdf"))
 
-println("  5 figures written to $(GRAPHDIR)")
+println("  6 figures written to $(GRAPHDIR)")
 
 banner("7. CHECKS ON THE MECHANISM")
 check("closure costs fall on route-lengthened economies, not a collector",
