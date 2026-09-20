@@ -1,7 +1,6 @@
 function landprice(param, fund, L, w, d, dist, nobs)
-    global alpha sigma theta epsilon LL LLwest LLeast
+    # global alpha sigma theta epsilon LL LLwest LLeast
 
-    xtic = tic()
 
     alpha = param[1]
     theta = param[2]
@@ -11,7 +10,7 @@ function landprice(param, fund, L, w, d, dist, nobs)
     b = fund[:, 2]
     H = fund[:, 3]
 
-    r = ((1 - alpha) / alpha) * ((w * L) / H)
+    r = ((1 - alpha) / alpha) .* ((w .* L) ./ H)
 
     return r
 end

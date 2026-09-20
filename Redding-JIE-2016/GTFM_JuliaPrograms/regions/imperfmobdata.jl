@@ -19,7 +19,9 @@ using SpecialFunctions: gamma # gamma function
 using Dierckx # 2D interpolation
 # using StatsModels: regress
 
-cd("Redding-JIE-2016/GTFM_JuliaPrograms/regions")
+# Work in this script's own folder, so that the graphs/ output paths resolve
+# however the script is invoked
+cd(@__DIR__)
 
 include("../graydist.jl")
 
@@ -400,12 +402,16 @@ YYL = range(minimum(ltd), stop=maximum(ltd), length=1000)'
 # @pyimport scipy.interpolate as si
 # using Dierckx
 function my_spline2d(x, y, z, xx, yy)
-    spl = Spline2D(collect(vec(x)), collect(vec(y)), collect(z))
+    # z is indexed [latitude, longitude], matching MATLAB's griddata and the
+    # reshape(.., N, N) above, so transpose it for Dierckx, which wants
+    # z[i, j] = f(x[i], y[j])
+    spl = Spline2D(collect(vec(x)), collect(vec(y)), collect(transpose(z)))
     xx = collect(vec(xx))
     yy = collect(vec(yy))
     xxe = repeat(xx, inner = length(yy))
-    yye = repeat(xx, outer = length(xx))
-    zz = evaluate(spl, xxe, yye)
+    yye = repeat(yy, outer = length(xx))
+    # contour(x, y, z) wants z of size (length(y), length(x))
+    zz = reshape(evaluate(spl, xxe, yye), length(yy), length(xx))
     return xx, yy, zz
 end
 # XXD, YYD, ZZD = griddata(lgd, ltd, mnrdmat, XXL, YYL)
@@ -781,8 +787,11 @@ savefig("graphs/H_prod_amen.pdf")
 
 @show "Treatment Regressions"
 
+include("functions/regress.jl")
+include("functions/regstats.jl")
+
 # Define controls
-X = [ones(size(treat)) treat]   
+X = [ones(size(treat)) treat]
 
 # Population treatment
 bL, bintL, rL, rintL, statsL = regress(ldL, X)  

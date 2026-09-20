@@ -1,5 +1,5 @@
 function Hpindex(param, fund, L, w, dtradesh, nobs)
-    global alpha Hsigma theta epsilon LL F
+    # global alpha Hsigma theta epsilon LL F
 
     # parameters
     alpha = param[1]
@@ -13,4 +13,6 @@ function Hpindex(param, fund, L, w, dtradesh, nobs)
 
     # price index
     P = (Hsigma / (Hsigma - 1)) .* (w ./ a) .* ((L ./ (Hsigma .* F .* dtradesh)).^(-1 ./ theta))
+
+    return P
 end

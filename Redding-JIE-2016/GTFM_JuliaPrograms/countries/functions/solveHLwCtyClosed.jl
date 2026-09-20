@@ -1,6 +1,6 @@
 function solveHLwCtyClosed(param, fund, dwght, dist, nobs)
     
-    global alpha theta epsilon LL LLwest LLeast
+    # global alpha theta epsilon LL LLwest LLeast
     
     xtic = time()
     
@@ -20,6 +20,11 @@ function solveHLwCtyClosed(param, fund, dwght, dist, nobs)
     L_i = ones(nobs) .* (LL / nobs)
     w_i = ones(nobs)
     
+    tradesh = 0
+    
+    dtradesh = 0
+
+    
     dd = dist .^ (-theta)
     dd = dwght .* dd
     
@@ -33,11 +38,11 @@ function solveHLwCtyClosed(param, fund, dwght, dist, nobs)
             
             pwmat = L_i .* (a .^ theta) .* (w_i .^ (-theta)) * ones(1, nobs)
             nummat = dd .* pwmat
-            denom = sum(nummat)
+            denom = sum(nummat, dims = 1)
             denommat = ones(nobs) * denom
             tradesh = nummat ./ denommat
             
-            test = sum(tradesh)
+            test = sum(tradesh, dims = 1)
             mntest = mean(test)
             
             income = w_i .* L_i

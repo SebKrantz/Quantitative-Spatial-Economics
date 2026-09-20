@@ -1,8 +1,7 @@
 function Hexpectut(param, fund, L, w, P, r, dist, nobs)
 
-    global alpha theta epsilon LL
+    # global alpha theta epsilon LL
 
-    xtic = tic()
 
     # parameters
     alpha = param[1]
@@ -21,7 +20,9 @@ function Hexpectut(param, fund, L, w, P, r, dist, nobs)
 
     # expected utility
     EU = b.*(P.^(-alpha.*epsilon)).*(r.^(-(1-alpha).*epsilon)).*((w./alpha).^epsilon)
-    EU[Iwest .== 1] = deltaf.*(sum(EU[Iwest .== 1]).^(1./epsilon))
-    EU[Ieast .== 1] = deltaf.*(sum(EU[Ieast .== 1]).^(1./epsilon))
+    EU[Iwest .== 1] .= deltaf.*(sum(EU[Iwest .== 1]).^(1 ./ epsilon))
+    EU[Ieast .== 1] .= deltaf.*(sum(EU[Ieast .== 1]).^(1 ./ epsilon))
 
+
+    return EU
 end

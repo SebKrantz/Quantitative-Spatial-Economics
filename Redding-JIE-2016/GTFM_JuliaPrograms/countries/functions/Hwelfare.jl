@@ -1,8 +1,7 @@
 function Hwelfare(param, fund, L, w, tradesh, dist, nobs)
 
-    global alpha theta epsilon Hsigma LL LLwest LLeast F
+    # global alpha theta epsilon Hsigma LL LLwest LLeast F
 
-    xtic = tic()
 
     # parameters
     alpha = param[1]
@@ -20,14 +19,14 @@ function Hwelfare(param, fund, L, w, tradesh, dist, nobs)
     deltaf = gamma((epsilon-1)./epsilon)
 
     # domestic trade share
-    dtradesh = diagm(tradesh)
+    dtradesh = diag(tradesh)
 
     # welfare
-    welf = deltaf.*(b.^(1./epsilon)).*(a.^alpha).*((1./dtradesh).^(alpha./theta)).*(H.^(1-alpha))
-    welf = welf.*(L.^(-((1./epsilon)+(1-alpha)-(alpha./theta))))
+    welf = deltaf.*(b.^(1 ./ epsilon)).*(a.^alpha).*((1 ./ dtradesh).^(alpha./theta)).*(H.^(1-alpha))
+    welf = welf.*(L.^(-((1 ./ epsilon)+(1-alpha)-(alpha./theta))))
     welf = welf./(alpha.*(((1-alpha)./alpha).^(1-alpha)).*((Hsigma./(Hsigma-1)).^alpha).*((Hsigma.*F).^(alpha./theta)))
-    welf[Iwest.==1] = welf[Iwest.==1]./(LLwest.^(-1./epsilon))
-    welf[Ieast.==1] = welf[Ieast.==1]./(LLeast.^(-1./epsilon))
+    welf[Iwest.==1] = welf[Iwest.==1]./(LLwest.^(-1 ./ epsilon))
+    welf[Ieast.==1] = welf[Ieast.==1]./(LLeast.^(-1 ./ epsilon))
 
     return welf
 end

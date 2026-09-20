@@ -1,7 +1,6 @@
 function pindex(param, fund, w, dtradesh, nobs)
-    global alpha sigma theta epsilon LL LLwest LLeast
+    # global alpha sigma theta epsilon LL LLwest LLeast
 
-    xtic = tic()
 
     alpha = param[1]
     theta = param[2]

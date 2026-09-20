@@ -1,6 +1,6 @@
 function solveLwCtyClosed(param,fund,dwght,dist,nobs)
 
-    global alpha sigma theta epsilon LL LLwest LLeast
+    # global alpha sigma theta epsilon LL LLwest LLeast
 
     xtic = time()
 
@@ -20,6 +20,11 @@ function solveLwCtyClosed(param,fund,dwght,dist,nobs)
     L_i = ones(nobs) .* (LL/nobs)
     w_i = ones(nobs)
 
+    tradesh = 0
+
+    dtradesh = 0
+
+
     dd = dist .^ (-theta)
     dd = dwght .* dd
 
@@ -33,11 +38,11 @@ function solveLwCtyClosed(param,fund,dwght,dist,nobs)
 
             pwmat = a .* (w_i .^ (-theta)) * ones(1, nobs)
             nummat = dd .* pwmat
-            denom = sum(nummat)
+            denom = sum(nummat, dims = 1)
             denommat = ones(nobs, 1) * denom
             tradesh = nummat ./ denommat
 
-            test = sum(tradesh)
+            test = sum(tradesh, dims = 1)
             mntest = mean(test)
 
             income = w_i .* L_i
@@ -91,4 +96,6 @@ function solveLwCtyClosed(param,fund,dwght,dist,nobs)
     xtic = time() - xtic
     println(xtic)
 
+
+    return w_i, L_i, tradesh, dtradesh, Lconverge, wconverge, xtic
 end
