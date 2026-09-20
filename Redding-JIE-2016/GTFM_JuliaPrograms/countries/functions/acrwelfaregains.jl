@@ -1,5 +1,5 @@
 function acrwelfaregains(param, Ctradesh, tradesh, CL, L, nobs)
-    global alpha sigma theta epsilon LL
+    # global alpha sigma theta epsilon LL
 
     # parameters
     alpha = param[1]

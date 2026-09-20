@@ -1,6 +1,6 @@
 function welfare(param, fund, L, w, tradesh, dist, nobs)
 
-    global alpha sigma theta epsilon LL LLwest LLeast
+    # global alpha sigma theta epsilon LL LLwest LLeast
 
     # parameters
     alpha = param[1]
@@ -23,9 +23,9 @@ function welfare(param, fund, L, w, tradesh, dist, nobs)
     dtradesh = diag(tradesh)
 
     # welfare
-    welf = deltaf.*(b.^(1./epsilon)).*((a./dtradesh).^(alpha./theta)).*(H.^(1-alpha)).*(L.^(-((1./epsilon)+(1-alpha))))
-    welf[Iwest.==1] = welf[Iwest.==1]./(alpha.*(((1-alpha)./alpha)^(1-alpha)).*(gammaf.^alpha).*(LLwest.^(-1./epsilon)))
-    welf[Ieast.==1] = welf[Ieast.==1]./(alpha.*(((1-alpha)./alpha)^(1-alpha)).*(gammaf.^alpha).*(LLeast.^(-1./epsilon)))
+    welf = deltaf.*(b.^(1 ./ epsilon)).*((a./dtradesh).^(alpha./theta)).*(H.^(1-alpha)).*(L.^(-((1 ./ epsilon)+(1-alpha))))
+    welf[Iwest.==1] = welf[Iwest.==1]./(alpha.*(((1-alpha)./alpha)^(1-alpha)).*(gammaf.^alpha).*(LLwest.^(-1 ./ epsilon)))
+    welf[Ieast.==1] = welf[Ieast.==1]./(alpha.*(((1-alpha)./alpha)^(1-alpha)).*(gammaf.^alpha).*(LLeast.^(-1 ./ epsilon)))
 
     return welf
 end

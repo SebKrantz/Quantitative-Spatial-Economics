@@ -1,8 +1,7 @@
 function expectut(param, fund, L, w, tradesh, dist, nobs)
 
-    global alpha sigma theta epsilon LL LLwest LLeast
+    # global alpha sigma theta epsilon LL LLwest LLeast
 
-    xtic = tic()
 
     # parameters
     alpha = param[1]
@@ -27,8 +26,8 @@ function expectut(param, fund, L, w, tradesh, dist, nobs)
     # expected utility
     EU = b.*(gammaf.^(-alpha.*epsilon)).*(alpha.^(-epsilon)).*(((1-alpha)./alpha).^(-epsilon.*(1-alpha)))
     EU = ((a./dtradesh).^(alpha.*epsilon./theta)).*((L./H).^(-epsilon.*(1-alpha))).*EU
-    EU[Iwest.==1] = deltaf.*(sum(EU[Iwest.==1]).^(1./epsilon))
-    EU[Ieast.==1] = deltaf.*(sum(EU[Ieast.==1]).^(1./epsilon))
+    EU[Iwest .== 1] .= deltaf.*(sum(EU[Iwest.==1]).^(1 ./ epsilon))
+    EU[Ieast .== 1] .= deltaf.*(sum(EU[Ieast.==1]).^(1 ./ epsilon))
 
     return EU
 end

@@ -1,6 +1,6 @@
 function solveImmobileCtyOpen(param, fund, L, dwght, dist, nobs)
 
-    global alpha sigma theta epsilon LL
+    # global alpha sigma theta epsilon LL
 
     xtic = time()
 
@@ -18,6 +18,11 @@ function solveImmobileCtyOpen(param, fund, L, dwght, dist, nobs)
 
     w_i = ones(nobs)
 
+    tradesh = 0
+
+    dtradesh = 0
+
+
     dd = dist .^ (-theta)
     dd = dwght .* dd
 
@@ -28,11 +33,11 @@ function solveImmobileCtyOpen(param, fund, L, dwght, dist, nobs)
 
         pwmat = a .* (w_i .^ (-theta)) * ones(1, nobs)
         nummat = dd .* pwmat
-        denom = sum(nummat)
+        denom = sum(nummat, dims = 1)
         denommat = ones(nobs) * denom
         tradesh = nummat ./ denommat
 
-        test = sum(tradesh)
+        test = sum(tradesh, dims = 1)
         mntest = mean(test)
 
         income = w_i .* L

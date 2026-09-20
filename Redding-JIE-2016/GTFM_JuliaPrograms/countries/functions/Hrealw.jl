@@ -1,8 +1,7 @@
 function Hrealw(param, fund, L, w, tradesh, dist, nobs)
 
-    global alpha Hsigma theta epsilon LL F
+    # global alpha Hsigma theta epsilon LL F
 
-    xtic = tic()
 
     # parameters
     alpha = param[1]

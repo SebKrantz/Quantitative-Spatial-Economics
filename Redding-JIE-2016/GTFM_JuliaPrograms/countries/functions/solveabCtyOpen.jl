@@ -1,5 +1,5 @@
 function solveabCtyOpen(param, observe, dwght, dist, nobs)
-    global alpha sigma theta epsilon LL LLwest LLeast
+    # global alpha sigma theta epsilon LL LLwest LLeast
 
     xtic = time()
 
@@ -13,6 +13,9 @@ function solveabCtyOpen(param, observe, dwght, dist, nobs)
     a_i = ones(nobs)
     b_i = ones(nobs)
 
+    tradesh = 0
+
+
     dd = dist .^ (-theta)
     dd = dwght .* dd
 
@@ -24,11 +27,11 @@ function solveabCtyOpen(param, observe, dwght, dist, nobs)
         while x < 2000
             pwmat = a_i .* (observe[:, 2] .^ (-theta))
             nummat = dd .* pwmat
-            denom = sum(nummat)
+            denom = sum(nummat, dims = 1)
             denommat = ones(nobs) * denom
             tradesh = nummat ./ denommat
 
-            test = sum(tradesh)
+            test = sum(tradesh, dims = 1)
             mntest = mean(test)
 
             income = observe[:, 2] .* observe[:, 1]
@@ -83,4 +86,6 @@ function solveabCtyOpen(param, observe, dwght, dist, nobs)
 
     xtic = time() - xtic
     xtic
+
+    return a_i, b_i, tradesh, aconverge, bconverge, xtic
 end

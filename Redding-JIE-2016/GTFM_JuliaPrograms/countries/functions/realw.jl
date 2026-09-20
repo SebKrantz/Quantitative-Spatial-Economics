@@ -1,8 +1,7 @@
 function realwage(param, fund, L, w, tradesh, dist, nobs)
 
-    global alpha sigma theta epsilon LL
+    # global alpha sigma theta epsilon LL
 
-    xtic = tic()
 
     # parameters
     alpha = param[1]

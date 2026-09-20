@@ -1,6 +1,6 @@
 function Hwelfaregains(param, Ctradesh, tradesh, CL, L, nobs)
 
-    global alpha Hsigma theta epsilon LL
+    # global alpha Hsigma theta epsilon LL
 
     # parameters
     alpha = param[1]
