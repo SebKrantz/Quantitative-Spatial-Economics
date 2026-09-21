@@ -1,0 +1,730 @@
+                         Codebook for:
+     The economics of density: Evidence from the Berlin Wall ∗
+
+Gabriel M. Ahlfeldt†        Stephen J. Redding‡          Daniel M. Sturm§       Nikolaus Wolf¶
+
+                                         June 18, 2025
+
+
+                                            Abstract
+ This codebook is part of the toolkit for Ahlfeldt, Redding, Sturm, Wolf (2015): The
+ economics of density: Evidence from the Berlin Wall, Econometrica, 83(6), pp. 2127-89.
+ The toolkit does not cover all stages of the analysis presented in the article. Instead,
+ it covers a subset of codes that are crucial for the quantification and simulation of the
+ model using 2006 data. The codebook summarizes the primitives and endogenous objects
+ of the models and introduces selected numerical algorithms in pseudo-code. The focus
+ is on algorithms that are essential for the quantification and simulation of the respective
+ quantitative models.
+
+
+
+
+ ∗
+   We thank Alexander Hansen and Andrea Herrera for comments and suggestions.
+ †
+   Humboldt University. Email: g.ahlfeldt@hu-berlin.de
+ ‡
+   Princeton University. Email: reddings@princeton.edu
+ §
+   London School of Economics. Email: d.m.sturm@lse.ac.uk
+ ¶
+   Humboldt University. Email: nikolaus.wolf@wiwi.hu-berlin.de
+A      Ahlfeldt, Redding, Sturm, and, Wolf (2015)
+This section covers Ahlfeldt, Redding, Sturm, and Wolf (2015): The economics of density:
+Evidence from the Berlin Wall. Econometrica, 83, https://doi.org/10.3982/ECTA10876.
+The model consists of exogenous parameters exogenous location characteristics, and endogenous
+objects tabulated in Table 1.
+
+A.1     Equilibrium
+Given the model’s exogenous parameters {α, β, µ, ε, κ}, the exogenous reservation utility level
+Ū , exogenous location characteristics {Ti , Ei , Ai , Bi , φi , Ki , ξi , τij }, the general equilibrium of
+the model without endogenous agglomeration forces is referenced by {πM i , πRi , Qi , qi , wi , θi , H}.
+These seven components of the equilibrium are determined by the following seven equations:
+                                                                 −ε              1/ε
+                                         PS PS                  −β                ε
+  1. Population mobility (9): E[u] = γ    r=1  s=1 Tr,s Es drs Qr      (Br , ws )        = Ū
+
+                                                                         PS
+                                                                          j=1 Φij
+                                                        PS
+    2. Residential choice probability (5): πRi =            j=1 πij =         Φ
+                                                                         PS
+                                                                          i=1 Φij
+                                                        PS
+    3. Workplace choice probability (5): πMj =              i=1 πij =         Φ
+                                                                 1/α
+                                                        (1−α)Aj
+    4. Commercial land market clearing (18):               qj            HMj = θj Lj
+
+    5. Residential land market clearing (19): (1 − β) E[wsQ|i]H
+                                                             i
+                                                                Ri
+                                                                   = (1 − θi )Li
+                                                                                  α/(1−α)
+                                                                              α                1/(1−α)
+    6. Profit maximization and zero profits (12): qj = (1 − α)                wj              Aj         .
+                                                               
+                                                               
+                                                               
+                                                               1                        if qi > ξi Qi ,
+                                                               
+    7. No-Arbitrage between alternative uses of land (13): θi = [0, 1]                   if qi = ξi Qi ,
+                                                               
+                                                               
+                                                               
+                                                               0                        if qi < ξi Qi .
+
+To quantify the model, we use the mapping created via the above equations to invert
+adjusted productivities, amenities, and density of development {Ãi , B̃i , φ̃i } which incorporate
+{Ti , Ei , Ai , Bi , φi , Ki , ξi }. When incorporating endogenous agglomeration forces, we decompose
+{Ãi , B̃i } into adjusted fundamental productivity and adjusted fundamental amenity {ãi , b̃i }
+and endogenous productivity and amenity, which depend on nearby workplace and residence
+employment density. We observe τij (through GIS modelling), but travel costs could, in principle,
+be inverted from bilateral commuting data. Once the model is fully quantified, we solve it
+numerically. To this end, we use the above equations to pin down the values of the target
+variables {w̃i , qi , Qi , θi }. For given values of model primitives and these target variables, we can
+solve for all other endogenous objects.
+    Notice that in the case with endogenous agglomeration forces, {Ai , Bi } are endogenous
+objects and {ai , ai } are exogenous characteristics. We have four more exogenous parameters
+{λ, δ, η, ρ}. For the two additional endogenous outcomes, we have two more equations.
+
+                                                        1
+                                                                 hP                          i
+                                                                     S    −δτis        HM s
+  8. Productivity spillovers (20): Aj = aj × Υλj ,        Υj =       s=1 e              Ks
+                                                               hP                       i
+  9. Residential spillovers (21): Bi = bi × Ωηi ,       Ωi =     S
+                                                                 s=1 e
+                                                                       −ρτis       HRs
+                                                                                   Ks
+
+Therefore, we remain exactly identified.
+
+
+
+
+                                                    2
+                                   Table 1: Codebook for ARSW2015
+
+Object                      Description
+
+                                           Structural parameters
+
+α                           Input share of floor space in production
+β                           Expenditure share on non-housing consumption
+µ                           Share of non-land inputs in floor space production
+ε                           Preference heterogeneity (labour supply elasticity)
+κ                           Iceberg commuting cost parameter
+ν = κϵ                      commuting decay
+λ                           Density elasticity or productivity
+δ                           Productivity decay
+η                           Density elasticity of residential amenity
+ρ                           Residential decay
+χ                           Scale parameter in relationship between floor space prices and land prices
+γ = Γ ε−1
+       ε                    Scale parameter in expected utility
+∆                           Parameter vector including {ν, ϵ, λ, δ, ν, ρ}
+
+                                          Exogenous characteristics
+
+aj                          Production fundamentals
+Aj                          Productivity
+Υj                          Endogenous productivity
+bi                          Residential fundamentals
+Bi                          Amenities
+Ωi                          Endogenous amenity
+ξi                          Tax-equivalent of land use regulations
+Ej                          Commuting destination-specific mean preference (from idiosyncratic shock)
+             α/ϵ
+Ãi = Ai Ei                 Adjusted productivity
+            α/ϵ
+ãi = ai Ei                 Adjusted production fundamentals
+             1/ϵ 1−β
+B̃i = Bi Ti /IR    i
+                            Adjusted amenities
+           1/ϵ 1−β
+b̃i = bi Ti /IR  i
+                            Adjusted residential fundamentals
+Ki                          Land endowment
+φi = Miµ = L1−µ    i
+                            Density of development
+                Ki
+                 1/ε
+φ̃i = φ̃i (φi , Ei , ξi )   Adjusted density of development
+Li = φi Ki1−µ               Total floor space in block, subscripts M,R index use
+τij                         Bilateral travel times
+Ū                          Reservation utility level
+
+                                     Endogenous variables and scalars
+
+                                                                                  Continued on next page
+
+
+
+                                                  3
+                                     Table 1 Continued from previous page
+Object                            Description
+
+H                                 Total city employment
+πij                               Commuting probabilities
+HM j                              Workplace employment (observed)
+HRi                               Residence employment (observed)
+wj                                Nominal wages (solved within the model)
+             PS
+E[ws |i] =    s=1 πis|j ws        Expected worker income
+                                                              1
+w̃j                               Adjusted wages w̃j = Ejε wj
+ωj                                Transformed wages ωj = w̃jϵ = Ej wjϵ
+                      ν′τ
+        PS
+Wit =    s=1 ωst /e               (Residential) Commuting market access
+                            ist
+
+
+li                                Floor space per resident
+Mi                                Capital
+θi                                Share of commercial floor space at total floor space
+qi                                Commercial floor space rent
+Qi                                Residential floor space rent
+θi                                Share of floor space use commercially
+                                  1 if qi > ξi Qi, [0,1] if qi = ξi Qi, 0 if qi < ξi Qi
+Qi = max{qi , Qi }                Observed floor space price, qi if qi > ξi Qi , qi if qi = ξi Qi , Qi if qi < ξi Qi
+Ri                                Land price
+yi                                output
+
+
+
+
+                                                          4
+A.2     Algorithms
+We introduce a subset of algorithms used by ARSW. We abstract from the computationally
+demanding structural estimation and focus on algorithms used for the quantification and
+simulation of the model. We refer to objects whose values we solve numerically as target objects.
+Within the solver, we refer to guessed values when values of target objects are input into the
+construction of other objects. We refer to predicted values when the values of target objects
+are computed as functions of other objects (which typically depend on guesses). Typically, we
+solve for the values of target objects using iterative procedures in which we update our guesses
+to weighted combinations of guessed and predicted values.
+
+A.2.1    One-step estimation of ω
+
+While estimation is not the focus of this toolkit, we cover the one-step estimation of the taste
+heterogeneity parameter ε. The procedure described below is not particularly computationally
+demanding. ε is less consensual than most of the other parameters and it is likely context-
+dependent. Therefore, it can be useful to estimate ε even though it might be justifiable to
+borrow values of many other parameters from the literature.
+     To estimate ε, we combine three algorithms. Algorithm 1 solves for transformed wages,
+ωi . Algorithm 2 uses transformed wages to compute the difference between the Bezirke-level
+variance in adjusted wages, w̃i , in model and data, our objective function. Algorithm 3 nests
+Algorithm 2 and searches for the value of ε that minimizes the value of the objective function.
+
+ Algorithm 1: Solving for transformed wages (ωj ): comegaoptO.m (used in estimation)
+  Data: Given values for structural parameters {α, β, κε}, bilateral travel times τij ,
+           observed workplace employment HM j and residence employment HRi
+            Guesses of transformed wages ω̃j0
+ 1 while Predicted workplace employment ĤM j ̸= HM j do
+
+ 2      Use guessed values of transformed wages ω̃j0 in Eq. (S.44) to predict ĤM j
+                                      HM j 0
+ 3      Generate new guesses ω̃j1 =        ω̂
+                                      ĤM j j
+ 4      Update guesses to weighted combination of new and old guesses
+ 5      Normalize guesses by geometric mean
+     Result: Transformed wages ω̃j
+
+
+
+
+                                                5
+ Algorithm 2: Compute value of objective function f (ε): cdensityoptren.m
+  Data: Current guess of ε
+           Model solutions of transformed wages ω from Algorithm 1 (comegaopt.m)
+           Variance of log wages across Bezirke σ̂ 2 (log(wB )) in data
+                                       1
+ 1 Compute adjusted wages w̃j = ωiε using ωi and current guess of ε
+
+ 2 Compute Bezirke adjusted wages w̃B
+
+ 3 Compute variance of log wages across Bezirke, σ 2 (log(w̃B )) in model
+
+ 4 Compute residual ftD = σ̂ 2 (log(wB )) − σ 2 (log(w̃B ))
+                                                          ′
+ 5 Compute current value of objective function f (ε) = ftD ftD (the residual sum of
+
+     squares)
+   Result: Value of objective function f (ε)
+
+
+A.2.2    Quantification with exogenous fundamentals (sequential procedure)
+
+This sub-section summarizes a sequential procedure during which Eqs. S.47 and S.48 are used
+to recover adjusted productivity, Ãi and adjusted amenity, B̃i . Algorithm 4 recovers adjusted
+wages, w̃i , from the commuting market clearing condition. Given adjusted wages, w̃i and
+observed floor space prices, Qi , it recovers adjusted productivity, Ãi . Using adjusted wages,
+w̃i , Algorithm 5 then recovers adjusted amenity B̃i . Using adjusted amenity B̃i along with
+adjusted wages, w̃i , Algorithm 7 computes expected total income, E(wi )HRi . Income, adjusted
+productivity and adjusted amenity are then used by Algorithm 8 to recover total floor space, Li
+and the share of commercial floor space, θi .
+   Going through these algorithms and the sequential quantification procedure is particularly
+useful for didactic purposes since there is a close link to the analytical solutions (up to scale) for
+{Ãi , B̃i } in Eqs. (27) and (28). Moreover, each of the algorithms individually is arguably more
+intuitive than the simultaneous quantification procedure introduced in Section A.3. Finally, the
+algorithms introduced here can be useful to understand how to solve for selected variables (e.g.
+adjusted wages) in other contexts.
+   Notice, however, that the algorithmic implementation of this sequential procedure in the
+original replication directory does not ensure that adjusted amenity and productivity are
+in the right scale to be input into the equilibrium solver in Algorithm 11.             Algorithm 9
+introduced in the next section, chooses the scales of {Ãi , B̃i } such that aggregate employment
+matches observed total employment. This is why Algorithm 9 is used for the quantification
+preceding counterfactuals in the paper. Adjusted productivity, Ãi and amenity, B̃i , recovered
+by Algorithms 1 and 5 are, of course, still entirely suitable if the objective is to analyze relative
+differences in amenity and productivity across locations. However, they should not be used as a
+starting point for counterfactuals without further adjustment.
+   To this end, this toolkit contains Algorithm 6, which is not part of the original replication
+directory. When executed after Algorithms 1 and 5, it rescales adjusted amenity, Ãi , and
+productivity, B̃i , to match observed total employment. As a result, the values of {Ãi , B̃i }
+are identical to the values recovered by Algorithm 9. This means that Algorithm 11 correctly
+
+
+                                                  6
+recovers the initial equilibrium using these values of {Ãi , B̃i }. So, after executing Algorithm 6,
+{Ãi , B̃i } from the sequential procedure can be used to solve for counterfactual equilibria.
+
+ Algorithm 3: Estimating ε using the MATLAB patternsearch algorithm
+  Data: Define initial guess of parameter value (ε)
+             Objective function f (ε) defined in Algorithm 2 (cdensityoptren.m)
+             Define initial step size
+             Define step size threshold
+ 1 while current step size > step size threshold do
+
+ 2      pattern points ← generate pattern(current point, current step size);
+ 3      (generate a pattern of test points [parameter values] around the current point)
+ 4      for point to pattern points do
+ 5          point value ← objective function(point) using Algorithm 2;
+ 6          (evaluate the objective function at each point [parameter value] in the pattern)
+ 7          if point value < objective function(current point) then
+ 8              current point ← point;
+ 9              (If a point with a lower value is found, update the current point [paramter
+                 value])
+
+10      if current point was not updated then
+11          current step size ← reduce step size(current step size);
+12          (If no better points were found, reduce the step size)
+     Result: Estimate of parameter value for ε that minimizes objective function f (ε)
+
+
+
+ Algorithm 4: Solving for adjusted wages (w̃j ) and productivities (Ãj ): comegaoptC.m
+ (used in calibration)
+   Data: Solver for transformed wages (ωj ) comegaoptO.m Algorithm 1
+             Given values for structural parameters {α, β, κε, ε}, bilateral travel times τij ,
+             observed workplace employment HM j and residence employment HRi ,
+             and floor space prices Qj
+             Guesses of adjusted wages w̃i0
+ 1 Compute guesses of transformed wages ωi0 = (w̃i0 )ε
+
+ 2 Use solver comegaoptO.m Algorithm 1 to solve for transformed wages ωj
+                                             1/ϵ
+ 3 Compute equilibrium adjusted wages w̃j = ωj
+
+ 4 Use adjusted wages w̃j and floor space prices Qj in Eq. S48 to solve for adjusted
+
+      productivities Ãj
+     Result: Adjusted wages and productivities {w̃j , Ãj }
+     Note: In the actual code directory, comegaoptC.m replicats much of the code from comegaoptO.m (instead
+     of calling comegaopt0.m).
+
+
+
+
+                                                   7
+Algorithm 5: Solving for adjusted amenities (B̃i ): camen.m
+ Data: Adjusted wages, w˜j solved by Algorithm 4 (comegaoptC.m)
+          Observed residence employment HRi and floor space prices Qi ,
+          bilateral travel times τij , estimated preference heterogeneity ε and
+          commuting decay εκ
+1 Use adjusted wages w̃i , bilateral travel times τij , and commuting decay κε to compute
+
+   commuting market access Wi using the commuting market access equation in Section
+   S.3.1.2.
+2 Use solved commuting market access Wi , observed residence employment HRi , floor
+
+   space prices Qj and estimated ε in Eq. S47 to solve for adjusted amenities B̃j
+  Result: Adjusted amenities, residential commuting market access {B̃i , Wi }
+
+
+
+Algorithm 6: Rescaling adjusted amenities B̃i and productivities Ãi to rationalize
+observed population H: calcal adj TD.m
+ Data: Given values for structural parameters {β, κε, ε}, bilateral travel times τij ,
+          adjusted productivities Ãi solved by Algorithm 4, adjusted amenities B̃i solved
+          by Algorithm 5, observed floor space prices Qj
+1 Normalize adjusted productivities Ãi by the geometric mean
+
+2 Use rescaled adjusted productivities Ãi and observed floor space prices Qj in Eq. (12)
+
+   to compute rescaled adjusted wages w̃j
+3 Use bilateral travel times τij , adjusted amenities B̃i , observed floor space prices Qj , and
+
+   rescaled adjusted wages w̃j to compute Φ (the denominator in Eq. (12) and the total
+   employment in the model)
+                                                                                      H
+                                                                                           1ε
+4 Rescale adjusted amenities B̃i by multiplying them by the adjustment factor         Φ          (see
+   supplement p. 18 to see that H scales in any spatially invariant component of Bi at an
+   elasticity of ε)
+  Result: Rescaled adjusted productivity and amenity {Ãi , B̃i }
+
+
+
+
+                                                8
+ Algorithm 7: Solving for total expected income (E(wi )HRi ) and adjusted productivity
+ Ãi : expincome.m
+   Data: Given values for structural parameters {β, κε, ε}, bilateral travel times τij ,
+           adjusted wages w̃j solved by Algorithm 4, adjusted amenities B̃i solved by
+           Algorithm 5 (camen.m), and observed residence employment HRi floor space
+           prices Qi
+ 1 Compute bilateral commuting probabilities πij using Eq. (5)
+
+ 2 Compute conditional commuting probabilities πij|i using Eq. (6)
+
+ 3 Compute expected worker income E(wi ) using Eq. (S.20)
+
+ 4 Use expected worker income E(wi ) and residential employment to compute total
+
+      expected income E(wi )HRi
+   Result: Total expected income E(wi )HRi
+
+
+ Algorithm 8: Solving for density of development (φi ), total floor space Li , and
+ commercial floor space share θi : cdensity.m
+   Data: Given values for structural parameters {α, β}, land endowment Ki , observed
+           floor space prices Qj , adjusted productivity Ãj solved by Algorithm 4
+           (comegaoptC.m), adjusted amenities B̃i solved by Algorithm 5 (camen.m)
+ 1 Compute commercial floor space demand θi Li using Eq. (S.29)
+
+ 2 Compute residential floor space demand (1 − θi )Li using Eq. (S.30)
+
+ 3 Compute total floor space demand Li = θi Li + (1 − θi )Li
+
+ 4 Use expected worker income E(wi ) and residence employment to compute total
+
+      expected income E(wi )HRi
+ 5 Compute density of development φi using Li , land area Ki and Eq. (S.31)
+                                             θL
+ 6 Compute commercial floor space share θi = L i
+                                                i
+   Result: Density of development, total floor space, and commercial floor space share
+             {φi , Li , θi }
+
+
+A.3     Counterfactuals with exogenous fundamentals
+A simple two-step procedure can be used to conduct flexible counterfactuals. In the first step,
+we use Algorithms 9 and 10 as well as observed values of the endogenous variables residence
+employment, HRi , workplace employment, HM i , and floor space prices Qi , to invert adjusted
+productivity Ãi and adjusted amenity B̃i . In the second step, we use the inverted values of
+{Ãi , B̃i } and Algorithm 11 to solve for all endogenous outcomes. We obtain solutions to a
+counterfactual instead of the observed equilibrium by changing any of the model’s primitives.
+   Algorithm 9 recovers {Ã, B̃} from one iterative procedure. The algorithm starts from guessed
+values of {Ã, B̃} and exploits the unique mapping from primitives to endogenous outcomes
+to compute residence and workplace employment {ĤM i , ĤRi }. It keeps adjusting the guesses
+of {Ã, B̃} until {ĤM i , ĤRi } correspond to the values observed in data. For the final {Ã, B̃}
+values, it further generates endogenous objects not observed in data, such as adjusted wages
+
+                                                9
+w̃j , commuting probabilities πij , and expected income E(w̃s ). Using the values of {Ãi , E(w̃i )}
+solved by Algorithm 9, Algorithm 10 recovers the exogenous density of development and total
+floor space {φi , Li } as well as the endogenous commercial floor space shares θi , which completes
+the quantification of the model.
+   Algorithm 11 exploits the unique mapping from primitives to endogenous outcomes to solve
+for the endogenous variables. It uses the values of {Ã, B̃} recovered using Algorithm 9. To
+this end, it uses an iterative procedure to solve for the values of the target variables adjusted
+wages, floor space prices, and commercial floor space shares {w̃i , qi , Qi , θi }. For the solved values
+of these target variables, the algorithm generates a range of further endogenous outcomes (all
+endogenous variables can be recovered from if the values of the target variables and primitives
+are known).
+   Notice that Algorithm 11 solves for the spatial equilibrium holding total employment, H
+constant. This corresponds to the closed-city case and implies the expected utility changes in
+the counterfactual. We cover the open-city case with endogenous H and fixed exogenous Ū in
+the next section, where we incorporate endogenous agglomeration forces.
+
+
+
+
+                                                   10
+ Algorithm 9: Solving for adjusted wage w̃i , adjusted productivity Ãi and adjusted
+ amenity (B̃i ): cmodexog.m
+  Data: Given values of endogenous variables floor space prices, workplace employment,
+                residence employment, {Qi , HM j , HRi }, structural parameters {α, β, κε, ε},
+                bilateral travel times τij , guesses of adjusted productivity and adjusted amenity,
+                {A˜0 , B˜0 }
+                  j    i
+                     ˜ , B˜0 } change do
+ 1 while guesses of {A0
+                      j    i
+ 2      Compute adjusted wages w̃j using guesses of Ã0j , observed Qj , and Eq. (12)
+ 3      Compute commuting probabilities π using Eq. (4) using guesses of {A˜0 , B˜0 } and
+                                                             ij                        j   i
+         w̃j using Eq. (4)
+ 4      Use πij to compute predicted workplace and residence employment {ĤM j , ĤRi }
+         using Eq. (5)
+ 5      Generate new guesses of Ã1i by inflating old guesses by the ratio of observed over
+         predicted workplace employment HM i /ĤM i (we increase guesses if we underpredict
+         employment)
+ 6      Generate new guesses of B̃i1 by inflating old guess by the ratio of observed over
+         predicted residence employment HRi /ĤRi (we increase guesses if we underpredict
+         employment)
+ 7      Update guesses of Ã0i to the weighted combination of new guess Ã1i and old guesses
+         Ã0i
+ 8      Update guesses of B̃i0 to the weighted combination of new guess B̃i1 and old guesses
+         B̃i0
+ 9      Normalize guesses Ã0i by the geometric mean to ensure a unit mean
+10      Inflate guesses of B̃i0 by the ratio of total employment in data over total predicted
+         employment in model (we make the city more attractive if we underpredict total
+         employment)
+11 Use solved w̃j , τij , and κϵ to compute commuting market access (see p. 40 in
+
+      supplement for equation)
+     Result: Adjusted productivities, adjusted amenities, adjusted wages, commuting
+                 probabilities, expected income, predicted workplace emplyoment, predicted
+                 residence employment, predicted total employment
+                 {Ãj , B̃j , w̃j , πij , E(w̃s |i), ĤM i , ĤRi }
+
+
+
+
+                                                                  11
+Algorithm 10: Solving for density of development φi , total floor space stock Li , and
+commercial floor space share θi : cdensityE.m
+  Data: Given values for structural parameters {α, β}, land endowment Ki , observed
+         floor space prices Qj adjusted productivity Ãj , adjusted amenity B̃i , and total
+         income E(wi ) solved by Algorithm 9 (cmodexog.m)
+1 Compute commercial floor space demand θi Li using Eq. (S.29)
+
+2 Compute residential floor space demand (1 − θi )Li using Eq. (S.30)
+
+3 Compute total floor space demand Li = θi Li + (1 − θi )LI
+
+4 Use expected worker income E(wi ) and residence employment to compute total
+
+   expected income E(wi )HRi
+5 Compute density of development φi using Li , land area Ki and Eq. (S.31)
+                                            θL
+6 Compute commercial floor space share θi = L i
+                                               i
+
+7 Compute commercial commercial and residential floor space using θi and Li
+
+  Result: Density of development, total floor space, and commercial floor space share
+           {φi , Li , θi }
+  Note: This is essentially the same code as in cdenisity.m, except that the algorithm also generates
+  the stock of commercial and residential floor space, which serve as guesses in smodex.m to speed up
+  convergence.
+
+
+
+
+                                              12
+ Algorithm 11: Solving for the equilibrium for given primitives: smodexog.m
+  Data: Given values of structural parameters {α, β, κ, ε}, bilateral travel times τij ,
+            inverted adjusted productivity, adjusted amenity, and floor space stock
+            {Ãj , B̃i , Li }; guesses of the target variables adjusted wages, commercial and
+            residential floor space prices, commercial floor space shares {w̃i0 , qi0 , Q0i , θi0 }; total
+            employment H.
+ 1 while guesses of target variables {w̃i0 , qi0 , Q0    0
+                                                    i , θi } change do
+ 2      Compute location choice probabilities πij using guesses of {w̃i0 , qi0 , Q0i } and {Ãj , B̃i }
+         in in Eq. (4)
+ 3      Compute residence and workplace employment {ĤM i , ĤRi } using πij , H and
+         residence and Eq. (5).
+ 4      Compute output Ŷi using the production function in Eq. (10), workplace
+         employment ĤM i , inverted total floor space Li , and guesses of θi0 .
+ 5      Compute predicted adjusted wage w̃i1 = α Ŷi using the input demand function
+                                                                 ĤM i
+         derived from F.O.C. of Eq. (10) and {Ŷi , and ĤM i }
+ 6      Compute total income E(ŵi × ĤM i } using Eq. (S.20), predicted w̃i1 , ĤM i , and
+                                                                         π
+         conditional commuting probabilities πij|i = P ijπij
+                                                                         j
+
+ 7      Compute predicted commercial and residential floor space prices {qi1 , Q1i } using Ŷ ,
+         guesses of θi0 , and Marshallian demand and input demand based on Eqs. (1) and
+         (10)
+ 8      Compute predicted values of θi0 using commercial floor space input LM i = (1 − α) qŶ1i
+                                                                                                        i
+         recovered from input demand function based on Eq. (10) and Li in Eq. (S.53)
+ 9      Update guesses of target variables {w̃i0 , qi0 , Q0i , θi0 } to weighted average of old guesses
+        {w̃i0 , qi0 , Q0i , θi0 } and predicted values {wi1 , qi1 , Q1i , θi1 }
+     Result: Predicted values of adjusted wage, total income, commercial floor space
+                shares, output, commercial and residential floor space prices, workplace
+                employment and residence, total employment, unconditional commuting
+                probabilities {w̃i , E(ŵi × ĤM i ), θi , Yi , qi , Qi , HM i , HRi , πij }
+
+
+A.4     Counterfactuals with endogenous agglomeration forces
+Conducting counterfactuals with endogenous agglomeration forces follows the two steps—
+quantification and simulation—as in the case with exogenous fundamentals. To quantify the
+model with endogenous agglomeration forces, we first recover adjusted productivity and adjusted
+amenity {Ãi , B̃i } using either the sequential procedure in Algorithms 4 and 5, plus the rescaling
+Algorithm 9, or the simultaneous procedure in Algorithm 9. We then break down {Ãi , B̃i } into
+endogenous components that depend on nearby density, {Υi , Ωi }, and exogenous components
+{ai , bi } using Algorithms 12 and 13. We then use Algorithm 10 to recover density of development,
+total floor space, and commercial floor space share {φi , Li , θi }. Using Algorithm 14 to recover
+the reservation utility level Ū completes the quantification.
+     For given primitives, Algorithm 15 solves for the equilibrium values of the endogenous
+
+                                                            13
+outcomes in the closed-city case where total employment H is exogenous and expected utility
+Ū is endogenous. To this end, it uses an iterative procedure to solve for the values of the target
+variables adjusted wages, floor space prices, and commercial floor space shares {w̃i , qi , Qi , θi }. For
+the solved values of these target variables, the algorithm generates a range of further endogenous
+outcomes (all endogenous variables can be recovered if the values of the target variables and
+primitives are known).
+    Algorithm 16 similarly solves for the equilibrium values of the endogenous outcomes in the
+open-city case where Ū is exogenous and total employment H is endogenous. The algorithm is
+very similar to Algorithm 15. It nests an additional adjustment within the loop in line 17 (of the
+pseudo code). If the predicted expected utility in the city exceeds the target, total employment
+is increased, which reduces the expected utility via the model’s endogenous congestion force. To
+ensure that the algorithm converges to the target expected utility, the stopping rule is extended
+in line 5.
+
+  Algorithm 12: Decomposing adjusted productivity Ãi : cprod.m
+   Data: Given values for structural parameters {λ, δ}, land endowment Ki , travel times
+             τij , adjusted productivities Ãj solved by Algorithm 9 and observed workplace
+             employment HM i
+ 1 Compute endogenous productivity Υi using {δ, τij , EM i , Ki } in Eq. (20)
+
+ 2 Compute exogenous productivity ai using {λ, Ãi , Υi } in Eq. (20)
+
+    Result: Endogenous and exogenous productivity Υi , ai
+
+
+  Algorithm 13: Decomposing adjusted amenity B̃i : cres.m
+   Data: Given values for structural parameters {η, ρ}, land endowment Ki , travel times
+             τij , adjusted amenity B̃j solved by Algorithm 9 and observed residence
+             employment HRi
+ 1 Compute endogenous amenity Ωi using {ρ, τij , ERi , Ki } in Eq. (21)
+
+ 2 Compute exogenous amenity bi using {η, B̃i , Ωi } in Eq. (21)
+
+    Result: Endogenous and exogenous amenity Ωi , bi
+
+
+  Algorithm 14: Computing reservation utility level Ū : ubar.m
+   Data: Given values for structural parameters {κ, ϵ}, travel times τij , adjusted amenity
+             B̃j solved by Algorithm 9 and floor space prices and wages {Qi , w̃i }
+ 1 Compute Ū using all inputs in Eq. (9)
+
+    Result: Endogenous and exogenous amenity Ωi , bi
+
+
+
+
+                                                   14
+ Algorithm 15: Solving for the equilibrium with endogenous agglomeration forces and
+ exogenous total employment H: smodendog.m
+   Data: Given values of structural parameters {α, β, κ, ε, µ}, bilateral travel times τij ,
+            land area Ki ; inverted fundamental productivity and amenity {ai , bi }, adjusted
+            density of development φ̃i ; guesses of the target variables: adjusted wages,
+            commercial and residential floor space prices, commercial floor space shares
+            {w̃i0 , qi0 , Q0i , θi0 } and initial values of workplace and residence employment
+            {HM i , HRi }; total employment H
+1 Compute floor space Li using φ̃i and Ki in Eq. (S.52)
+
+2 Compute adjusted productivity Ãi using τij and initial values of HM i and Eq. (20)
+
+3 Compute adjusted amenity B̃i using τij and initial values of HRi and Eq. (21)
+                                                 P
+4 Compute total employment H =                       HM i
+5 while guesses of target variables {w̃i0 , qi0 , Q0    0
+                                                   i , θi } change do
+ 6      Compute choice probabilities πij using guesses of {w̃i0 , qi0 , Q0i , θi0 } and {Ãi , B̃i } in Eq.
+         (4)
+ 7      Compute residence and workplace employment {ĤM i , ĤRi } using π̂ij , H and Eq. (5)
+ 8      Compute utility Û using guesses of {w̃i0 , qi0 , Q0i , θi0 } and {Ãi , B̃i } in Eq. (9)
+ 9      Compute Ãi using τij and ĤM i in Eq. (20)
+10      Compute B̃i using τij and ĤRi in Eq. (21)
+11      Compute output Ŷi using the production function in Eq. (10), ĤM i , total floor
+         space Li , and guesses of θi0
+12      Compute predicted adjusted wage w̃i1 = α Ŷi using the input demand function
+                                                                    ĤM i
+         derived from F.O.C. of Eq. (10), and {Ŷi , ĤM i }
+13      Compute total income E(ŵi × ĤRi } using Eq. (S.20), {w̃i1 , ĤM i }, and conditional
+                                                        Φ
+         commuting probabilities πij|i = P ijΦij
+                                                         j
+
+14      Compute predicted commercial and residential floor space prices {qi1 , Q1i } using Ŷ ,
+         guesses of θi0 , and Marshallian demand functions and input demand functions
+         based on Eqs. (1) and (10)
+15      Compute predicted values of commercial floor space θi1 using commercial floor space
+         input LM i = (1 − α) qŶ1i recovered from input demand function based on Eqs. (10)
+                                       i
+         and (S.53)
+16      Update guesses of target variables {w̃i0 , qi0 , Q0i , θi0 } to weighted average of old guesses
+        {w̃i0 , qi0 , Q0i , θi0 } and predicted values {wi1 , q̂i1 , Q̂1i , θ̂i1 }
+     Result: Predicted values of adjusted wage, total income, commercial floor space shares,
+               output, commercial and residential floor space prices, workplace employment
+               and residence, total employment, unconditional commuting probabilities
+               {w̃i , E(ŵi × ĤM i , θi , Yi , qi , Qi , HM i , HRi , Ãi, B̃i , Ū , πij }
+
+
+
+
+                                                               15
+ Algorithm 16: Solving for the equilibrium with endogenous agglomeration forces and
+ exogenous reservation utility: ussmodendog.m
+   Data: Given values of structural parameters {α, β, κ, ε, µ}, bilateral travel times τij ,
+            land area Ki ; inverted fundamental productivity and amenity {ai , bi }, adjusted
+            density of development φ̃i ; guesses of the target variables: adjusted wages,
+            commercial and residential floor space prices, commercial floor space shares
+            {w̃i0 , qi0 , Q0i , θi0 } and initial values of workplace and residence employment
+            {HM i , HRi }; calibrated value of exogenous reservation utility level Ū
+1 Compute floor space Li using φ̃i and Ki in Eq. (S.52)
+
+2 Compute adjusted productivity Ãi using τij and initial values of HM i and Eq. (20)
+
+3 Compute adjusted amenity B̃i using τij and initial values of HRi and Eq. (21)
+                                                 P
+4 Compute total employment H =                       HM i
+5 while guesses of target variables {w̃i0 , qi0 , Q0    0
+                                                   i , θi } change or E(U ) ̸= Ū do
+ 6      Compute choice probabilities πij using guesses of {w̃i0 , qi0 , Q0i , θi0 } and {Ãi , B̃i } in Eq.
+         (4)
+ 7      Compute residence and workplace employment {ĤM i , ĤRi } using π̂ij , H and Eq. (5)
+ 8      Compute utility Û using guesses of {w̃i0 , qi0 , Q0i , θi0 } and {Ãi , B̃i } in Eq. (9)
+ 9      Compute Ãi using τij and ĤM i in Eq. (20)
+10      Compute B̃i using τij and ĤRi in Eq. (21)
+11      Compute output Ŷi using the production function in Eq. (10), ĤM i , total floor
+         space Li , and guesses of θi0
+12      Compute predicted adjusted wage w̃i1 = α Ŷi using the input demand function
+                                                                    ĤM i
+         derived from F.O.C. of Eq. (10), and {Ŷi , ĤM i }
+13      Compute total income E(ŵi × ĤRi } using Eq. (S.20), {w̃i1 , ĤM i }, and conditional
+                                                        Φ
+         commuting probabilities πij|i = P ijΦij
+                                                         j
+
+14      Compute predicted commercial and residential floor space prices {qi1 , Q1i } using Ŷ ,
+         guesses of θi0 , and Marshallian demand functions and input demand functions
+         based on Eqs. (1) and (10)
+15      Compute predicted values of commercial floor space θi1 using commercial floor space
+         input LM i = (1 − α) qŶ1i recovered from input demand function based on Eqs. (10)
+                                       i
+         and (S.53)
+16      Update guesses of target variables {w̃i0 , qi0 , Q0i , θi0 } to weighted average of old guesses
+         {w̃i0 , qi0 , Q0i , θi0 } and predicted values {wi1 , q̂i1 , Q̂1i , θ̂i1 }
+                                                         Û
+17      Update H using adjustment factor that depends on Ū (we increase total
+        employment if expected utility exceeds reservation utility)
+     Result: Predicted values of adjusted wage, total income, commercial floor space shares,
+               output, commercial and residential floor space prices, workplace employment
+               and residence, total employment, unconditional commuting probabilities
+               {w̃i , E(ŵi ) × ĤM i , θi , Yi , qi , Qi , HM i , HRi , Ãi, B̃i , H, πij }
+
+
+
+
+                                                               16
+
